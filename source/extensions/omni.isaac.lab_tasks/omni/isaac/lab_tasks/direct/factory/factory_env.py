@@ -23,7 +23,7 @@ from .factory_env_cfg import OBS_DIM_CFG, STATE_DIM_CFG, FactoryEnvCfg
 class FactoryEnv(DirectRLEnv):
     cfg: FactoryEnvCfg
 
-    def __init__(self, cfg: FactoryEnvCfg, render_mode: str | None = None, **kwargs):
+    def __init__(self, cfg: FactoryEnvCfg, render_mode: str | None = None, **kwargs): # NA
         # Update number of obs/states
         cfg.observation_space = sum([OBS_DIM_CFG[obs] for obs in cfg.obs_order])
         cfg.state_space = sum([STATE_DIM_CFG[state] for state in cfg.state_order])
@@ -38,7 +38,7 @@ class FactoryEnv(DirectRLEnv):
         self._set_default_dynamics_parameters()
         self._compute_intermediate_values(dt=self.physics_dt)
 
-    def _set_body_inertias(self):
+    def _set_body_inertias(self):                                                      # NA                                                         
         """Note: this is to account for the asset_options.armature parameter in IGE."""
         inertias = self._robot.root_physx_view.get_inertias()
         offset = torch.zeros_like(inertias)
@@ -46,7 +46,7 @@ class FactoryEnv(DirectRLEnv):
         new_inertias = inertias + offset
         self._robot.root_physx_view.set_inertias(new_inertias, torch.arange(self.num_envs))
 
-    def _set_default_dynamics_parameters(self):
+    def _set_default_dynamics_parameters(self):                                       # NA  
         """Set parameters defining dynamic interactions."""
         self.default_gains = torch.tensor(self.cfg.ctrl.default_task_prop_gains, device=self.device).repeat(
             (self.num_envs, 1)
@@ -64,7 +64,7 @@ class FactoryEnv(DirectRLEnv):
         self._set_friction(self._fixed_asset, self.cfg_task.fixed_asset_cfg.friction)
         self._set_friction(self._robot, self.cfg_task.robot_cfg.friction)
 
-    def _set_friction(self, asset, value):
+    def _set_friction(self, asset, value):                                      # NA    
         """Update material properties for a given asset."""
         materials = asset.root_physx_view.get_material_properties()
         materials[..., 0] = value  # Static friction.
@@ -463,7 +463,7 @@ class FactoryEnv(DirectRLEnv):
             success_threshold=self.cfg_task.success_threshold, check_rot=check_rot
         )
 
-        rew_buf = self._update_rew_buf(curr_successes)
+        rew_buf = self._update_rew_buf(curr_successes)  # Compute reward at current timestep.
 
         # Only log episode success rates at the end of an episode.
         if torch.any(self.reset_buf):
@@ -524,7 +524,7 @@ class FactoryEnv(DirectRLEnv):
 
         return rew_buf
 
-    def _reset_idx(self, env_ids):
+    def _reset_idx(self, env_ids):                                          # 
         """
         We assume all envs will always be reset at the same time.
         """
@@ -536,7 +536,7 @@ class FactoryEnv(DirectRLEnv):
 
         self.randomize_initial_state(env_ids)
 
-    def _get_target_gear_base_offset(self):
+    def _get_target_gear_base_offset(self):                                 # Not used
         """Get offset of target gear from the gear base asset."""
         target_gear = self.cfg_task.target_gear
         if target_gear == "gear_large":
@@ -671,7 +671,10 @@ class FactoryEnv(DirectRLEnv):
             self.cfg_task.fixed_asset_init_pos_noise, dtype=torch.float32, device=self.device
         )
         fixed_pos_init_rand = fixed_pos_init_rand @ torch.diag(fixed_asset_init_pos_rand)
+
         fixed_state[:, 0:3] += fixed_pos_init_rand + self.scene.env_origins[env_ids]
+        #fixed_state[:, 0:3] += self.scene.env_origins[env_ids]
+
         # (1.b.) Orientation
         fixed_orn_init_yaw = np.deg2rad(self.cfg_task.fixed_asset_init_orn_deg)
         fixed_orn_yaw_range = np.deg2rad(self.cfg_task.fixed_asset_init_orn_range_deg)
@@ -694,7 +697,7 @@ class FactoryEnv(DirectRLEnv):
         fixed_asset_pos_rand = torch.tensor(self.cfg.obs_rand.fixed_asset_pos, dtype=torch.float32, device=self.device)
         fixed_asset_pos_noise = fixed_asset_pos_noise @ torch.diag(fixed_asset_pos_rand)
         self.init_fixed_pos_obs_noise[:] = fixed_asset_pos_noise
-
+        
         self.step_sim_no_action()
 
         # Compute the frame on the bolt that would be used as observation: fixed_pos_obs_frame
@@ -709,7 +712,7 @@ class FactoryEnv(DirectRLEnv):
             self.fixed_quat, self.fixed_pos, self.identity_quat, fixed_tip_pos_local
         )
         self.fixed_pos_obs_frame[:] = fixed_tip_pos
-
+        print(fixed_tip_pos)
         # (2) Move gripper to randomizes location above fixed asset. Keep trying until IK succeeds.
         # (a) get position vector to target
         bad_envs = env_ids.clone()
