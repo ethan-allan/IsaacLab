@@ -45,3 +45,10 @@ class FrankaReachEnvCfg_PLAY(FrankaReachEnvCfg):
         self.scene.env_spacing = 2.5
         # disable randomization for play
         self.observations.policy.enable_corruption = False
+
+
+def main():
+    env_cfg=FrankaReachEnvCfg()
+    env_cfg.scene.num_envs=2
+    env = ManagerBasedRLEnv(env_cfg)
+    

@@ -16,7 +16,7 @@
 
 
 import argparse
-
+from math import sqrt
 from omni.isaac.lab.app import AppLauncher
 
 # create argparser
@@ -37,7 +37,7 @@ import omni.isaac.lab.sim as sim_utils
 from omni.isaac.lab.utils.assets import ISAAC_NUCLEUS_DIR
 
 
-def design_scene():
+def setup_lab():
     """Designs the scene by spawning ground plane, light, objects and meshes from usd files."""
     # Ground-plane
     cfg_ground = sim_utils.GroundPlaneCfg()
@@ -49,11 +49,7 @@ def design_scene():
 
     prim_utils.create_prim("/World/Objects", "Xform")
  
-    cfg_table = sim_utils.CuboidCfg(
-        size=(0.91,1.5,0.84),
-        visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(1.0, 1.0, 1.0)),
-
-    )
+ 
     cfg_desk = sim_utils.CuboidCfg(
         size=(0.6,1.22,0.8),
         visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(1.0, 1.0, 1.0)))
@@ -73,21 +69,23 @@ def design_scene():
     cfg_cupboard2 = sim_utils.CuboidCfg(
         size=(1.2,0.72,2.0),
         visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(1.0, 1.0, 1.0)),
-ffe
+
     ) #Cupboard configuration fgg
     cfg_floor= sim_utils.CuboidCfg(size=(3.2,3.9,0.001),
         visual_material=sim_utils.PreviewSurfaceCfg( diffuse_color=(0.1, 0.1, 0.1)))
     cfg_baseplate=sim_utils.CuboidCfg(size=(0.24,0.24,0.02), visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(0.1, 0.1, 0.1)))
-
+    kr10_cfg = sim_utils.UsdFileCfg(usd_path=f"source/extensions/omni.isaac.lab_assets/data/Robots/KR10/KR10.usd")
 # here we spawn the objects
-    cfg_baseplate.func("/World/Objects/baseplate", cfg_baseplate, translation=(cfg_baseplate.size[0]/2+0.715, cfg_baseplate.size[0]/2+0.465, cfg_baseplate.size[0]/2+0.84))
+    cfg_baseplate.func("/World/Objects/baseplate", cfg_baseplate, translation=(cfg_baseplate.size[0]/2+0.715, cfg_baseplate.size[1]/2+0.465, cfg_baseplate.size[2]/2+0.84))
     cfg_floor.func("/World/Objects/floor", cfg_floor, translation=(cfg_floor.size[0]/2, cfg_floor.size[1]/2,0))
     cfg_plinth.func("/World/Objects/Plinth", cfg_plinth, translation=(0.91+cfg_plinth.radius,2.21+cfg_plinth.radius , cfg_plinth.height/2))
     cfg_pole.func("/World/Objects/Pole", cfg_pole, translation=(cfg_pole.radius+0.34, cfg_pole.radius+0.27, cfg_pole.height/2))
-    cfg_table.func("/World/Objects/Table", cfg_table, translation=(0.38+cfg_table.size[0]/2, 0.42+cfg_table.size[1]/2, cfg_table.size[2]/2))
-    cfg_desk.func("/World/Objects/Desk", cfg_desk, translation=(cfg_desk.size[0]/2 + 2.6, cfg_desk.size[1]/2+0.4, cfg_table.size[2]/2))
+    cfg_desk.func("/World/Objects/Desk", cfg_desk, translation=(cfg_desk.size[0]/2 + 2.6, cfg_desk.size[1]/2+0.4, cfg_desk.size[2]/2))
     cfg_cupboard1.func("/World/Objects/Cupboard1", cfg_cupboard1, translation=(1.4+cfg_cupboard1.size[0]/2, 3.17+cfg_cupboard1.size[1]/2, cfg_cupboard1.size[2]/2))
     cfg_cupboard2.func("/World/Objects/Cupboard2", cfg_cupboard2, translation=(2.0+cfg_cupboard2.size[0]/2, 3.17+cfg_cupboard2.size[1]/2, cfg_cupboard2.size[2]/2))
+
+    kr10_cfg.func("/World/Objects/KR10", kr10_cfg, translation=(cfg_baseplate.size[0]/2+0.715, cfg_baseplate.size[1]/2+0.465, cfg_baseplate.size[2]/2+0.84), orientation=(0.71,0.0 , 0, 0.71))
+
 def main():
     """Main function."""
 
@@ -95,10 +93,10 @@ def main():
     sim_cfg = sim_utils.SimulationCfg(dt=0.01, device=args_cli.device)
     sim = sim_utils.SimulationContext(sim_cfg)
     # Set main camera
-    sim.set_camera_view([2.0, 0.0, 2.5], [-0.5, 0.0, 0.5])
+    sim.set_camera_view([2.0, 0.0, 2.5], [0.71, 0.0, -0.71])
 
     # Design scene by adding assets to it
-    design_scene()
+    setup_lab()
 
     # Play the simulator
     sim.reset()

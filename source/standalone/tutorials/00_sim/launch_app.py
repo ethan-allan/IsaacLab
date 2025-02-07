@@ -19,7 +19,7 @@ This script demonstrates how to run IsaacSim via the AppLauncher
 import argparse
 
 from omni.isaac.lab.app import AppLauncher
-
+#fe
 # create argparser
 parser = argparse.ArgumentParser(description="Tutorial on running IsaacSim via the AppLauncher.")
 parser.add_argument("--size", type=float, default=1.0, help="Side-length of cuboid")
