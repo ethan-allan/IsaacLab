@@ -112,6 +112,23 @@ class FrankaTestSceneCfg(InteractiveSceneCfg):
                 ),
             ),
         )
+    
+    object = RigidObjectCfg(
+            prim_path="{ENV_REGEX_NS}/Object",
+            init_state=RigidObjectCfg.InitialStateCfg(pos=[0.5, 0, 0.055], rot=[1, 0, 0, 0]),
+            spawn=sim_utils.UsdFileCfg(
+                usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/Blocks/DexCube/dex_cube_instanceable.usd",
+                scale=(0.8, 0.8, 0.8),
+                rigid_props=RigidBodyPropertiesCfg(
+                    solver_position_iteration_count=16,
+                    solver_velocity_iteration_count=1,
+                    max_angular_velocity=1000.0,
+                    max_linear_velocity=1000.0,
+                    max_depenetration_velocity=5.0,
+                    disable_gravity=False,
+                ),
+            ),
+        )
     #peg = RigidObject(cfg=peg_cfg)
     
     sample = AssetBaseCfg(prim_path="{ENV_REGEX_NS}/sample",                                                                # ENV_REGEX_NS allows the part to be replicated for each environment instane
@@ -314,10 +331,15 @@ class FrankaEnvCfg(ManagerBasedRLEnvCfg):
     def __post__init__(self):
         self.viewer.eye = [4.5,0.0,6.0]
         self.viewer.lookat = [0.8, 0.0, 0.5]
-        self.decimation =2
+        self.sim.render_interval = self.decimation
+
         self.sim.dt = 1.0 /60.0
 
-
+        self.sim.physx.bounce_threshold_velocity = 0.2
+        self.sim.physx.bounce_threshold_velocity = 0.01
+        self.sim.physx.gpu_found_lost_aggregate_pairs_capacity = 1024 * 1024 * 4
+        self.sim.physx.gpu_total_aggregate_pairs_capacity = 16 * 1024
+        self.sim.physx.friction_correlation_distance = 0.00625
 
         
 
