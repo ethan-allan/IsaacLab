@@ -4,21 +4,11 @@
 # In its current state the environment is created using 00_screw_env_cfg.py and an action 
 # and observatio5ns manager are used to interact with the Franka
 
-
-# Plan:
-# 1. 
-
-#----------------------------------------------------------------------------------------------
-# Generic IsaacLab startup code.
-# Reads cmd line arguments and creates a simulation app instance with them.
-# Currently this demo won't do anything with cmd line arguments but normally used for env configs.
-#----------------------------------------------------------------------------------------------
-
-
-# launch omniverse app
-
-#---------------------------------------------------------------------------------------------
-
+# This script must be ran by the IsaacLab bash script:
+# ./isaaclab.sh -p source/standalone/workflows/rl_games/train.py --task Isaac-IK-Franka-v0
+# ./isaaclab.sh -p source/standalone/workflows/rl_games/play.py --task Isaac-IK-Franka-v0
+#
+# To add new training environments to the bash script edit the init file
 
 #-------------------------------------------------------------------------------------------
 # Imports
@@ -63,15 +53,21 @@ import omni.isaac.lab_tasks.manager_based.custom.inv_kin.cfg.mdp as mdp
 
 
 #-------------------------------------------------------------------------------------------
-# Configuration classes 
-# Manager-based base env only supports the following configuration classes:
-# 1. ActionsCfg
-# 2. ObservationsCfg
-# 3. EventCfg
-# 4. TerminationsCfg
-# 5. RewardsCfg
-# 6. CommandsCfg
-# 7. ManagerBasedEnvCfg
+#                               Configuration classes:
+# 
+# Sim Management Classes:
+# FrankaTestSceneCfg - Sets up the physical scene
+# EventCfg
+# TerminationsCfg
+# CommandsCfg
+# ManagerBasedEnvCfg
+
+# RL Classes:
+# ObservationsCfg
+# ActionsCfg
+# RewardsCfg
+
+# FrankaEnvCfg - Instantiates the other environments as a manager-based RL environment
 #-------------------------------------------------------------------------------------------
 
 @configclass
@@ -93,40 +89,10 @@ class FrankaTestSceneCfg(InteractiveSceneCfg):
         prim_path="/World/Light", spawn=sim_utils.DomeLightCfg(intensity=3000.0, color=(0.75, 0.75, 0.75))
     )
 
-    # Spawns in the panda. Currently set to the low stiffness version.
+    # Spawns in the panda. Currently set to the high stiffness version.
     robot =FRANKA_PANDA_HIGH_PD_CFG.replace(prim_path="{ENV_REGEX_NS}/robot")
     
-
-@configclass
-class RewardsCfg:
-    # Need to come up with basic reward function, will maybe steal this from franka reach
-    # Distance to point makes the most sense, just need to work out how to get there
-    
-    end_effector_position_tracking = RewTerm(
-        func=mdp.position_command_error,
-        weight=-0.2,
-        params={"asset_cfg": SceneEntityCfg("robot", body_names="panda_hand"), "command_name": "ee_pose"},
-    )
-    # end_effector_position_tracking_fine_grained = RewTerm(
-    #     func=mdp.position_command_error_tanh,
-    #     weight=0.1,
-    #     params={"asset_cfg": SceneEntityCfg("robot", body_names="panda_hand"), "std": 0.1, "command_name": "ee_pose"},
-    # )
-    # end_effector_orientation_tracking = RewTerm(
-    #     func=mdp.orientation_command_error,
-    #     weight=-0.1,
-    #     params={"asset_cfg": SceneEntityCfg("robot", body_names="panda_hand"), "command_name": "ee_pose"},
-    # )
-    # action_rate = RewTerm(func=mdp.action_rate_l2, weight=-0.0001)
-    # joint_vel = RewTerm(
-    #     func=mdp.joint_vel_l2,
-    #     weight=-0.0001,
-    #     params={"asset_cfg": SceneEntityCfg("robot")},
-    # )
-
 #-------------------------------------------------------------------------------------------
-
-
 @configclass
 class CommandsCfg:
     """Command terms for the MDP."""
@@ -145,6 +111,44 @@ class CommandsCfg:
             yaw=(-3.14, 3.14),
         ),
     )
+#-------------------------------------------------------------------------------------------
+@configclass
+class EventCfg:
+#Used to define all events that can occur in the environment and what to do
+#Currently just using reset but there are also startup and interval
+
+    # Resets all the joints to some random position
+    reset_robot_position = EventTerm(
+        func=mdp.reset_joints_by_offset,
+        mode="reset",
+        params={
+            "asset_cfg": SceneEntityCfg("robot", joint_names=["panda_joint.*"]),
+            "position_range": (0.5, 1.5),
+            "velocity_range": (0.0, 0.0),
+        },
+    )
+
+#-------------------------------------------------------------------------------------------
+
+@configclass
+class TerminationsCfg:
+    time_out=DoneTerm(func=mdp.time_out,time_out=True)
+    
+
+#-------------------------------------------------------------------------------------------
+@configclass
+class RewardsCfg:
+    # Need to come up with basic reward function, will maybe steal this from franka reach
+    # Distance to point makes the most sense, just need to work out how to get there
+    
+    end_effector_position_tracking = RewTerm(
+        func=mdp.position_command_error,
+        weight=-0.2,
+        params={"asset_cfg": SceneEntityCfg("robot", body_names="panda_hand"), "command_name": "ee_pose"},
+    )
+
+
+
 #-------------------------------------------------------------------------------------------
 @configclass
 class ObservationsCfg:
@@ -190,30 +194,6 @@ class ActionsCfg:
         )
     
 
-
-#------------------------------------------------------------------------------------------- 
-@configclass
-class EventCfg:
-#Used to define all events that can occur in the environment and what to do
-#Currently just using reset but there are also startup and interval
-
-    # Resets all the joints to some random position
-    reset_robot_position = EventTerm(
-        func=mdp.reset_joints_by_offset,
-        mode="reset",
-        params={
-            "asset_cfg": SceneEntityCfg("robot", joint_names=["panda_joint.*"]),
-            "position_range": (0.5, 1.5),
-            "velocity_range": (0.0, 0.0),
-        },
-    )
-#-------------------------------------------------------------------------------------------
-
-@configclass
-class TerminationsCfg:
-    time_out=DoneTerm(func=mdp.time_out,time_out=True)
-    
-
 #-------------------------------------------------------------------------------------------
 # Manager-based env config is used to used to instantiate all of the 
 # other managers and create the environment.
@@ -241,48 +221,4 @@ class FrankaEnvCfg(ManagerBasedRLEnvCfg):
         self.sim.dt = 1.0 /60.0
 
 
-#-------------------------------------------------------------------------------------------
-# Main function
-#-------------------------------------------------------------------------------------------
-# def main():
-
-#     # Create the environment
-#     env_cfg=FrankaEnvCfg()
-
-#     # Set the number of environments to spawn
-#     env_cfg.scene.num_envs=2048
-
-#     env = ManagerBasedRLEnv(cfg= env_cfg)
-
-#     # Simulation loop
-#     count =0
-#     while simulation_app.is_running():
-#         avg_rews=[]
-#         avg_rew=0
-#         with torch.inference_mode():
-#             # if count %  200== 0:
-#             #     count=0
-#             #     #env.reset()
-                
-#             #     avg_rews.append(avg_rew)
-#             #     print("-" * 80)
-#             #     print("[INFO]: Resetting environment...")
-#             #     avg_rew=0
-
-
-#             # sample random actions
-#             joint_efforts = torch.randn_like(env.action_manager.action)
-#             # step the environment
-#             obs, rews, _, _, _= env.step(joint_efforts)
-#             # print current orientation of pole
-#             print("[Env 0]: Pole joint: ", obs["policy"][0][1].item())
-#             avg_rew=torch.mean(rews)
-#             print("Average reward: ", avg_rew)
-#             # update counter
-#             # count += 1
-#     env.close()
-
-# if __name__ == "__main__":
-#     main()
-#     simulation_app.close()
 
