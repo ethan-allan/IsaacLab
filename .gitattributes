@@ -10,3 +10,5 @@
 *.pt filter=lfs diff=lfs merge=lfs -text
 *.jit filter=lfs diff=lfs merge=lfs -text
 *.hdf5 filter=lfs diff=lfs merge=lfs -text
+/home/ethanallan175/IsaacLab/source/extensions/omni.isaac.lab_tasks/omni/isaac/lab_tasks/manager_based/custom/screw_removal filter=lfs diff=lfs merge=lfs -text
+copy/peg_v15.usd filter=lfs diff=lfs merge=lfs -text
