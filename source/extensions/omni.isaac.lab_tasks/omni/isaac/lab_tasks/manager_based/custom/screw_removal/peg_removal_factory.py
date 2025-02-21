@@ -49,23 +49,22 @@ from omni.isaac.lab.envs.mdp.actions.actions_cfg import DifferentialInverseKinem
 from omni.isaac.lab.sensors import FrameTransformerCfg
 from omni.isaac.lab.sensors.frame_transformer.frame_transformer_cfg import OffsetCfg, FrameTransformerCfg
 import omni.isaac.lab.sim as sim_utils                           # Provides the ground plane and dome light
-from omni.isaac.lab.assets import  AssetBaseCfg, RigidObjectCfg, RigidObject, ArticulationCfg   # Provides base asset configuration class  (generic structure for storing assets)       
+from omni.isaac.lab.assets import  AssetBaseCfg,ArticulationCfg, RigidObjectCfg, RigidObject   # Provides base asset configuration class  (generic structure for storing assets)       
 from omni.isaac.lab.sim.schemas.schemas_cfg import RigidBodyPropertiesCfg
 from omni.isaac.lab.scene import  InteractiveSceneCfg            # Provides interactive scene cfg (generic structure for scene cfg)
 from omni.isaac.lab.utils import configclass                     # Config class decorator to override some features of python 3.7 dataclasses
                                                                  # Dataclasses require type annotation for memebres, this stops that. More info here: https://isaac-sim.github.io/IsaacLab/main/source/api/lab/isaaclab.utils.html#module-isaaclab.utils.configclass 
+
+
 from omni.isaac.lab_assets.franka import FRANKA_PANDA_HIGH_PD_CFG        # Provides the Franka Panda robot configuration  
 from omni.isaac.lab.markers.config import FRAME_MARKER_CFG  # isort: skip
 from omni.isaac.lab.utils.assets import ISAACLAB_NUCLEUS_DIR
-ASSET_DIR = f"{ISAACLAB_NUCLEUS_DIR}/Factory"
+
 
 
 #Custom package imports
 #from screw_env_cfg import FrankaTestSceneCfg
-try:
-    from . import mdp
-except (ImportError, ModuleNotFoundError) as e:
-    import mdp
+from . import mdp
 #-------------------------------------------------------------------------------------------
 
 
@@ -94,54 +93,36 @@ class FrankaTestSceneCfg(InteractiveSceneCfg):
     
    
         
+    # scene.peg = RigidObjectCfg(
+    #             prim_path="{ENV_REGEX_NS}/peg",
+    #             init_state=RigidObjectCfg.InitialStateCfg(pos=[0.3, 0.3, 0.15], rot=[0, 0, 0, 0]))    
     
-    peg = RigidObjectCfg(
-            prim_path="{ENV_REGEX_NS}/peg",
-            init_state=RigidObjectCfg.InitialStateCfg(pos=[0.3, 5.3, 0.15], rot=[0, 0, 0, 0]),
-            spawn=sim_utils.UsdFileCfg(
-                usd_path=f"/home/ethanallan175/IsaacLab/source/extensions/omni.isaac.lab_tasks/omni/isaac/lab_tasks/manager_based/custom/screw_removal/peg_pm.usd",
-                mass_props=sim_utils.MassPropertiesCfg(mass=0.1),
-                visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(1.0, 1.0, 1.0), metallic=0.2),
-                scale=(0.001 , 0.001, 0.001),
-            ),  
-        )
-    # peg: ArticulationCfg = ArticulationCfg(
-    #     prim_path="/World/envs/env_.*/peg",
-    #     spawn=sim_utils.UsdFileCfg(
-    #         usd_path=f"/home/ethanallan175/IsaacLab/source/extensions/omni.isaac.lab_tasks/omni/isaac/lab_tasks/manager_based/custom/screw_removal/bolt.usd",
-    #         activate_contact_sensors=True,
-    #         rigid_props=sim_utils.RigidBodyPropertiesCfg(
-    #             disable_gravity=False,
-    #             max_depenetration_velocity=5.0,
-    #             linear_damping=0.0,
-    #             angular_damping=0.0,
-    #             max_linear_velocity=1000.0,
-    #             max_angular_velocity=3666.0,
-    #             enable_gyroscopic_forces=True,
-    #             solver_position_iteration_count=192,
-    #             solver_velocity_iteration_count=1,
-    #             max_contact_impulse=1e32,
-    #         ),
-    #         mass_props=sim_utils.MassPropertiesCfg(mass=0.05),
-    #         collision_props=sim_utils.CollisionPropertiesCfg(contact_offset=0.005, rest_offset=0.0),
-    #     ),
-    #     init_state=ArticulationCfg.InitialStateCfg(
-    #         pos=(0.0, 0.4, 0.1), rot=(1.0, 0.0, 0.0, 0.0), joint_pos={}, joint_vel={}
-    #     ),
-    #     actuators={},
-    # )
-    # cone_cfg = RigidObjectCfg(
-    #     prim_path="{ENV_REGEX_NS}/Cone",
-    #     spawn=sim_utils.ConeCfg(radius=0.1,
-    #                             height=0.2,
-    #                             rigid_props=sim_utils.RigidBodyPropertiesCfg(),
-    #                             mass_props=sim_utils.MassPropertiesCfg(),
-    #                             collision_props=sim_utils.CollisionPropertiesCfg(),
-    #                             visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(0.0,1.0,0.0), metallic=0.2),
-    #                             ),
-    #                             init_state=RigidObjectCfg.InitialStateCfg(),
-    
-    #cone_object = RigidObject(cfg=cone_cfg)
+    factory_nut_loose: ArticulationCfg = ArticulationCfg(
+        prim_path="/World/envs/env_.*/factory_nut_loose",
+        spawn=sim_utils.UsdFileCfg(
+            usd_path=f"{ISAACLAB_NUCLEUS_DIR}/Factory/factory_nut_m16.usd",
+            activate_contact_sensors=True,
+            rigid_props=sim_utils.RigidBodyPropertiesCfg(
+                disable_gravity=True,
+                max_depenetration_velocity=5.0,
+                linear_damping=0.0,
+                angular_damping=0.0,
+                max_linear_velocity=1000.0,
+                max_angular_velocity=3666.0,
+                enable_gyroscopic_forces=True,
+                solver_position_iteration_count=192,
+                solver_velocity_iteration_count=1,
+                max_contact_impulse=1e32,
+            ),
+            mass_props=sim_utils.MassPropertiesCfg(mass=0.03),
+            collision_props=sim_utils.CollisionPropertiesCfg(contact_offset=0.005, rest_offset=0.0),
+        ),
+        init_state=ArticulationCfg.InitialStateCfg(
+            pos=(0.0, 0.4, 0.1), rot=(1.0, 0.0, 0.0, 0.0), joint_pos={}, joint_vel={}
+        ),
+        actuators={},
+    )
+
     
     # object = RigidObjectCfg(
     #         prim_path="{ENV_REGEX_NS}/Object",
@@ -159,41 +140,12 @@ class FrankaTestSceneCfg(InteractiveSceneCfg):
     #             ),
     #         ),
     #     )
-   # usd_path = f"{ASSET_DIR}/factory_bolt_m16.usd"
-
-    # held_asset = ArticulationCfg(
-    #     prim_path="/World/envs/env_.*/HeldAsset",
-    #     spawn=sim_utils.UsdFileCfg(
-    #         usd_path=f"{ASSET_DIR}/factory_bolt_m16.usd",
-    #         activate_contact_sensors=True,
-    #         rigid_props=sim_utils.RigidBodyPropertiesCfg(
-    #             disable_gravity=True,
-    #             max_depenetration_velocity=5.0,
-    #             linear_damping=0.0,
-    #             angular_damping=0.0,
-    #             max_linear_velocity=1000.0,
-    #             max_angular_velocity=3666.0,
-    #             enable_gyroscopic_forces=True,
-    #             solver_position_iteration_count=192,
-    #             solver_velocity_iteration_count=1,
-    #             max_contact_impulse=1e32,
-    #         ),
-    #         mass_props=sim_utils.MassPropertiesCfg(mass=0.05),
-    #         collision_props=sim_utils.CollisionPropertiesCfg(contact_offset=0.005, rest_offset=0.0),
-    #     ),
-    #     init_state=ArticulationCfg.InitialStateCfg(
-    #         pos=(0.0, 0.4, 0.1), rot=(1.0, 0.0, 0.0, 0.0), joint_pos={}, joint_vel={}
-    #     ),
-    #     actuators={},
-    # )
-
-
-
-
-    sample = AssetBaseCfg(prim_path="{ENV_REGEX_NS}/sample",                                                                # ENV_REGEX_NS allows the part to be replicated for each environment instane
-                        init_state=AssetBaseCfg.InitialStateCfg(pos=[0.3, 0.3, 0.0], rot=[0.707, 0 ,0.0, 0.707]),           # Pose and rotation in format [x,y,z] and [w,a,b,c] respectively           # 
-                        spawn=sim_utils.UsdFileCfg(usd_path=f"/home/ethanallan175/IsaacLab/source/extensions/omni.isaac.lab_tasks/omni/isaac/lab_tasks/manager_based/custom/screw_removal/sample.usd" ))
-
+    #peg = RigidObject(cfg=peg_cfg)
+    
+    # sample = AssetBaseCfg(prim_path="{ENV_REGEX_NS}/sample",                                                                # ENV_REGEX_NS allows the part to be replicated for each environment instane
+    #                         init_state=AssetBaseCfg.InitialStateCfg(pos=[0.3, 0.3, 0.0], rot=[0.707, 0 ,0.0, 0.707]),           # Pose and rotation in format [x,y,z] and [w,a,b,c] respectively           # 
+    #                         spawn=sim_utils.UsdFileCfg(usd_path=f"/home/ethanallan175/IsaacLab/source/extensions/omni.isaac.lab_tasks/omni/isaac/lab_tasks/manager_based/custom/screw_removal/sample.usd" ))
+    
     
     # Spawns dome light
     dome_light = AssetBaseCfg(
@@ -323,22 +275,22 @@ class EventCfg:
     # Resets all the joints to some random position
     reset_all = EventTerm(func=mdp.reset_scene_to_default, mode="reset")
 
-    # reset_object_position = EventTerm(
-    #     func=mdp.reset_root_state_uniform,
-    #     mode="reset",
-    #     params={
-    #         "pose_range": {"x": (-0.1, 0.1), "y": (-0.25, 0.25), "z": (0.0, 0.0)},
-    #         "velocity_range": {},
-    #         "asset_cfg": SceneEntityCfg("peg", body_names="peg"),
-    #     },
-    # )
+    reset_object_position = EventTerm(
+        func=mdp.reset_root_state_uniform,
+        mode="reset",
+        params={
+            "pose_range": {"x": (-0.1, 0.1), "y": (-0.25, 0.25), "z": (0.0, 0.0)},
+            "velocity_range": {},
+            "asset_cfg": SceneEntityCfg("factory_nut_loose", body_names="factory_nut_loose"),
+        },
+    )
 
 #-------------------------------------------------------------------------------------------
 @configclass
 class TerminationsCfg:
     time_out=DoneTerm(func=mdp.time_out,time_out=True)
     object_dropping = DoneTerm(
-        func=mdp.root_height_below_minimum, params={"minimum_height": -0.05, "asset_cfg": SceneEntityCfg("peg")}
+        func=mdp.root_height_below_minimum, params={"minimum_height": -0.05, "asset_cfg": SceneEntityCfg("factory_nut_loose")}
     )
 
 #-------------------------------------------------------------------------------------------
@@ -348,7 +300,7 @@ class TerminationsCfg:
 class FrankaEnvCfg(ManagerBasedRLEnvCfg):
 
     # Scene configuration
-    scene = FrankaTestSceneCfg(num_envs=22, env_spacing=2.0)
+    scene = FrankaTestSceneCfg(num_envs=2, env_spacing=2.0)
 
 
 
@@ -364,7 +316,7 @@ class FrankaEnvCfg(ManagerBasedRLEnvCfg):
     curriculum = CurriculumCfg()
     episode_length_s= 12
     # Decimation rate
-    decimation = 1
+    decimation = 2
 
     
     
@@ -403,4 +355,3 @@ class FrankaEnvCfg(ManagerBasedRLEnvCfg):
         
 
 #-------------------------------------------------------------------------------------------
-
