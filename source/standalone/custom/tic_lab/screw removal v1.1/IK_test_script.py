@@ -252,8 +252,7 @@ def main():
             # sample random actions
             
             # step the environment
-            joint_efforts = torch.randn_like(env.action_manager.action)
-            obs, rews, _, _, _= env.step(joint_efforts)
+            obs, rews, _, _, _= env.step(env.action_manager.action)
             # print current orientation of pole
             print("[Env 0]: Pole joint: ", obs["policy"][0][1].item())
             avg_rew=torch.mean(rews)

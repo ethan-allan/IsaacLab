@@ -40,11 +40,13 @@ from omni.isaac.lab.managers import (
     ObservationTermCfg as ObsTerm,
     RewardTermCfg as RewTerm,
     ActionTermCfg as ActionTerm,
+    CurriculumTermCfg as CurrTerm,
     SceneEntityCfg,
     TerminationTermCfg as DoneTerm
 )
 from omni.isaac.lab.controllers.differential_ik_cfg import DifferentialIKControllerCfg
 from omni.isaac.lab.envs.mdp.actions.actions_cfg import DifferentialInverseKinematicsActionCfg
+from omni.isaac.lab.managers import CurriculumTermCfg as CurrTerm
 
 import omni.isaac.lab.sim as sim_utils                           # Provides the ground plane and dome light
 from omni.isaac.lab.assets import  AssetBaseCfg                  # Provides base asset configuration class  (generic structure for storing assets)       
@@ -109,7 +111,7 @@ class RewardsCfg:
     )
     end_effector_position_tracking_fine_grained = RewTerm(
         func=mdp.position_command_error_tanh,
-        weight=0.1,
+        weight=0.5,
         params={"asset_cfg": SceneEntityCfg("robot", body_names="panda_hand"), "std": 0.1, "command_name": "ee_pose"},
     )
     end_effector_orientation_tracking = RewTerm(
@@ -213,7 +215,18 @@ class EventCfg:
 class TerminationsCfg:
     time_out=DoneTerm(func=mdp.time_out,time_out=True)
     
+#-------------------------------------------------------------------------------------------
+@configclass
+class CurriculumCfg:
+    """Curriculum terms for the MDP."""
 
+    action_rate = CurrTerm(
+        func=mdp.modify_reward_weight, params={"term_name": "action_rate", "weight": -0.005, "num_steps": 4500}
+    )
+
+    joint_vel = CurrTerm(
+        func=mdp.modify_reward_weight, params={"term_name": "joint_vel", "weight": -0.001, "num_steps": 4500}
+    )
 #-------------------------------------------------------------------------------------------
 # Manager-based env config is used to used to instantiate all of the 
 # other managers and create the environment.
@@ -230,6 +243,7 @@ class FrankaEnvCfg(ManagerBasedRLEnvCfg):
     rewards= RewardsCfg()
     commands= CommandsCfg()
     terminations= TerminationsCfg()
+    currciulum = CurriculumCfg()
     episode_length_s= 12
     # Decimation rate
     decimation = 2
@@ -237,6 +251,7 @@ class FrankaEnvCfg(ManagerBasedRLEnvCfg):
     def __post__init__(self):
         self.viewer.eye = [4.5,0.0,6.0]
         self.viewer.lookat = [0.8, 0.0, 0.5]
+        self.episode_length_s = 12
         self.decimation =2
         self.sim.dt = 1.0 /60.0
 

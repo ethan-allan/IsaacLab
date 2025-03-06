@@ -19,7 +19,7 @@ from omni.isaac.lab.app import AppLauncher
 
 # add argparse arguments
 parser = argparse.ArgumentParser(description="Tutorial on using the interactive scene interface.")
-parser.add_argument("--num_envs", type=int, default=2, help="Number of environments to spawn.")
+parser.add_argument("--num_envs", type=int, default=512, help="Number of environments to spawn.")
 # append AppLauncher cli args
 AppLauncher.add_app_launcher_args(parser)
 # parse the arguments
@@ -43,6 +43,8 @@ from omni.isaac.lab.sensors import FrameTransformerCfg
 from omni.isaac.lab.sensors.frame_transformer.frame_transformer_cfg import OffsetCfg, FrameTransformerCfg
 from omni.isaac.lab.assets import  AssetBaseCfg, RigidObjectCfg   # Provides base asset configuration class  (generic structure for storing assets)       
 from omni.isaac.lab.sim.schemas.schemas_cfg import RigidBodyPropertiesCfg
+from omni.isaac.lab_assets.franka import FRANKA_PANDA_HIGH_PD_CFG        # Provides the Franka Panda robot configuration  
+
 # Pre-defined configs
 ##
 
@@ -58,24 +60,24 @@ class CartpoleSceneCfg(InteractiveSceneCfg):
     dome_light = AssetBaseCfg(
         prim_path="/World/Light", spawn=sim_utils.DomeLightCfg(intensity=3000.0, color=(0.75, 0.75, 0.75))
     )
-    peg_cfg = RigidObjectCfg(
-            prim_path="{ENV_REGEX_NS}/peg",
-            init_state=RigidObjectCfg.InitialStateCfg(pos=[0.3, 0.3, 0.15], rot=[0, 0, 0, 0]),
-            spawn=sim_utils.UsdFileCfg(
-                usd_path=f"/home/ethanallan175/IsaacLab/source/extensions/omni.isaac.lab_tasks/omni/isaac/lab_tasks/manager_based/custom/screw_removal/peg_v1.usd",
+    # peg_cfg = RigidObjectCfg(
+    #         prim_path="{ENV_REGEX_NS}/peg",
+    #         init_state=RigidObjectCfg.InitialStateCfg(pos=[0.3, 0.3, 0.15], rot=[0, 0, 0, 0]),
+    #         spawn=sim_utils.UsdFileCfg(
+    #             usd_path=f"/home/ethanallan175/IsaacLab/source/extensions/omni.isaac.lab_tasks/omni/isaac/lab_tasks/manager_based/custom/screw_removal/peg_v1.usd",
                 
-                scale=(1.0 , 1.0, 1.0),
-            ),
+    #             scale=(1.0 , 1.0, 1.0),
+    #         ),
 
             
-        )
+    #     )
     
     # peg_cfg = RigidObject(cfg=peg_cfg)
-    sample = AssetBaseCfg(prim_path="{ENV_REGEX_NS}/sample",                                                                # ENV_REGEX_NS allows the part to be replicated for each environment instane
+    sample = AssetBaseCfg(prim_path="{ENV_REGEX_NS}/assembly",                                                                # ENV_REGEX_NS allows the part to be replicated for each environment instane
                             init_state=AssetBaseCfg.InitialStateCfg(pos=[0.3, 0.3, 0.0], rot=[0.707, 0 ,0.0, 0.707]),           # Pose and rotation in format [x,y,z] and [w,a,b,c] respectively           # 
-                            spawn=sim_utils.UsdFileCfg(usd_path=f"/home/ethanallan175/IsaacLab/source/extensions/omni.isaac.lab_tasks/omni/isaac/lab_tasks/manager_based/custom/screw_removal/sample.usd" ))
+                            spawn=sim_utils.UsdFileCfg(usd_path=f"/home/ethanallan175/IsaacLab/source/extensions/omni.isaac.lab_tasks/omni/isaac/lab_tasks/manager_based/custom/screw_removal/assembled.usd" ))
     
-    
+    robot =FRANKA_PANDA_HIGH_PD_CFG.replace(prim_path="{ENV_REGEX_NS}/robot")
 
 def run_simulator(sim: sim_utils.SimulationContext, scene: InteractiveScene):
     """Runs the simulation loop."""

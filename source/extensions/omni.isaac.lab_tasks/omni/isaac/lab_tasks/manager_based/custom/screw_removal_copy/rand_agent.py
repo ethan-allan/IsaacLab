@@ -43,9 +43,9 @@ def main():
     #     args_cli.task, device=args_cli.device, num_envs=args_cli.num_envs, use_fabric=not args_cli.disable_fabric
     # )
     env_cfg = parse_env_cfg(
-        "Isaac-Peg-Basic")
+        "Isaac-Peg-Basic-Test")
     # create environment
-    env = gym.make("Isaac-Peg-Basic", cfg=env_cfg)
+    env = gym.make("Isaac-Peg-Basic-Test", cfg=env_cfg)
 
     # print info (this is vectorized environment)
     print(f"[INFO]: Gym observation space: {env.observation_space}")
@@ -57,7 +57,7 @@ def main():
         # run everything in inference mode
         with torch.inference_mode():
             # sample actions from -1 to 1
-            actions = 0 * torch.rand(env.action_space.shape, device=env.unwrapped.device) 
+            actions = 1 * torch.rand(env.action_space.shape, device=env.unwrapped.device) 
             #apply actions
             env.step(actions)
             

@@ -24,7 +24,21 @@ def object_is_lifted(
     object: RigidObject = env.scene[object_cfg.name]
     return torch.where(object.data.root_link_pos_w[:, 2] > minimal_height, 1.0, 0.0)
 
+def object_height(
+    env: ManagerBasedRLEnv,  object_cfg: SceneEntityCfg = SceneEntityCfg("peg")
+) -> torch.Tensor:
+    """Reward the agent for lifting the object above the minimal height."""
+    object: RigidObject = env.scene[object_cfg.name]
+    obj_height=object.data.root_link_pos_w[:, 2]
+    return -5*(obj_height-1)**2
 
+def punish_ground_collision(
+    env: ManagerBasedRLEnv, ground_height: float, object_cfg: SceneEntityCfg = SceneEntityCfg("ee_frame")
+) -> torch.Tensor:
+    """Punish the agent for colliding with the ground."""
+    ee_frame: FrameTransformer = env.scene[ee_frame_cfg.name]
+    ee_w = ee_frame.data.target_pos_w[..., 0, :]
+    return torch.where(ee_w[:, 2] < ground_height, -1.0, 0.0)
 def object_ee_distance(
     env: ManagerBasedRLEnv,
     std: float,
@@ -41,9 +55,11 @@ def object_ee_distance(
     ee_w = ee_frame.data.target_pos_w[..., 0, :]
     # Distance of the end-effector to the object: (num_envs,)
     object_ee_distance = torch.norm(cube_pos_w - ee_w, dim=1)
-
-    return 1 - torch.tanh(object_ee_distance / std)
-
+    
+    lin_reward =  object_ee_distance / std
+    tanh_reward =  2*torch.tanh(4*object_ee_distance)
+    #return 1 - torch.tanh(object_ee_distance / std)
+    return -1*(lin_reward + tanh_reward)
 
 def object_goal_distance(
     env: ManagerBasedRLEnv,

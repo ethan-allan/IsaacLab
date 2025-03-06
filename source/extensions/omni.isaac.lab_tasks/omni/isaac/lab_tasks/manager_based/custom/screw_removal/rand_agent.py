@@ -57,10 +57,10 @@ def main():
         # run everything in inference mode
         with torch.inference_mode():
             # sample actions from -1 to 1
-            actions = 0 * torch.rand(env.action_space.shape, device=env.unwrapped.device) 
+            actions = 1 * torch.rand(env.action_space.shape, device=env.unwrapped.device) 
             #apply actions
-            env.step(actions)
-            
+            obs, rews, _, _, _=env.step(actions)
+            print(rews)
     # close the simulator
     env.close()
 

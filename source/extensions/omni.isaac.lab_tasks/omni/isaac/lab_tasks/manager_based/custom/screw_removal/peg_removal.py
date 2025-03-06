@@ -97,102 +97,22 @@ class FrankaTestSceneCfg(InteractiveSceneCfg):
     
     peg = RigidObjectCfg(
             prim_path="{ENV_REGEX_NS}/peg",
-            init_state=RigidObjectCfg.InitialStateCfg(pos=[0.3, 5.3, 0.15], rot=[0, 0, 0, 0]),
             spawn=sim_utils.UsdFileCfg(
-                usd_path=f"/home/ethanallan175/IsaacLab/source/extensions/omni.isaac.lab_tasks/omni/isaac/lab_tasks/manager_based/custom/screw_removal/peg_pm.usd",
-                mass_props=sim_utils.MassPropertiesCfg(mass=0.1),
-                visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(1.0, 1.0, 1.0), metallic=0.2),
-                scale=(0.001 , 0.001, 0.001),
+                usd_path=f"/home/ethanallan175/IsaacLab/source/standalone/custom/assets/peg_usd/peg.usd",
+               
+                rigid_props=sim_utils.RigidBodyPropertiesCfg(
+                    rigid_body_enabled=True,
+                    max_linear_velocity=1000.0,
+                    max_angular_velocity=1000.0,
+                    max_depenetration_velocity=5.0,
+                    enable_gyroscopic_forces=True,
+                    disable_gravity=False
+                )
             ),  
         )
-    # peg: ArticulationCfg = ArticulationCfg(
-    #     prim_path="/World/envs/env_.*/peg",
-    #     spawn=sim_utils.UsdFileCfg(
-    #         usd_path=f"/home/ethanallan175/IsaacLab/source/extensions/omni.isaac.lab_tasks/omni/isaac/lab_tasks/manager_based/custom/screw_removal/bolt.usd",
-    #         activate_contact_sensors=True,
-    #         rigid_props=sim_utils.RigidBodyPropertiesCfg(
-    #             disable_gravity=False,
-    #             max_depenetration_velocity=5.0,
-    #             linear_damping=0.0,
-    #             angular_damping=0.0,
-    #             max_linear_velocity=1000.0,
-    #             max_angular_velocity=3666.0,
-    #             enable_gyroscopic_forces=True,
-    #             solver_position_iteration_count=192,
-    #             solver_velocity_iteration_count=1,
-    #             max_contact_impulse=1e32,
-    #         ),
-    #         mass_props=sim_utils.MassPropertiesCfg(mass=0.05),
-    #         collision_props=sim_utils.CollisionPropertiesCfg(contact_offset=0.005, rest_offset=0.0),
-    #     ),
-    #     init_state=ArticulationCfg.InitialStateCfg(
-    #         pos=(0.0, 0.4, 0.1), rot=(1.0, 0.0, 0.0, 0.0), joint_pos={}, joint_vel={}
-    #     ),
-    #     actuators={},
-    # )
-    # cone_cfg = RigidObjectCfg(
-    #     prim_path="{ENV_REGEX_NS}/Cone",
-    #     spawn=sim_utils.ConeCfg(radius=0.1,
-    #                             height=0.2,
-    #                             rigid_props=sim_utils.RigidBodyPropertiesCfg(),
-    #                             mass_props=sim_utils.MassPropertiesCfg(),
-    #                             collision_props=sim_utils.CollisionPropertiesCfg(),
-    #                             visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(0.0,1.0,0.0), metallic=0.2),
-    #                             ),
-    #                             init_state=RigidObjectCfg.InitialStateCfg(),
-    
-    #cone_object = RigidObject(cfg=cone_cfg)
-    
-    # object = RigidObjectCfg(
-    #         prim_path="{ENV_REGEX_NS}/Object",
-    #         init_state=RigidObjectCfg.InitialStateCfg(pos=[0.5, 0, 0.055], rot=[1, 0, 0, 0]),
-    #         spawn=sim_utils.UsdFileCfg(
-    #             usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/Blocks/DexCube/dex_cube_instanceable.usd",
-    #             scale=(0.8, 0.8, 0.8),
-    #             rigid_props=RigidBodyPropertiesCfg(
-    #                 solver_position_iteration_count=16,
-    #                 solver_velocity_iteration_count=1,
-    #                 max_angular_velocity=1000.0,
-    #                 max_linear_velocity=1000.0,
-    #                 max_depenetration_velocity=5.0,
-    #                 disable_gravity=False,
-    #             ),
-    #         ),
-    #     )
-   # usd_path = f"{ASSET_DIR}/factory_bolt_m16.usd"
-
-    # held_asset = ArticulationCfg(
-    #     prim_path="/World/envs/env_.*/HeldAsset",
-    #     spawn=sim_utils.UsdFileCfg(
-    #         usd_path=f"{ASSET_DIR}/factory_bolt_m16.usd",
-    #         activate_contact_sensors=True,
-    #         rigid_props=sim_utils.RigidBodyPropertiesCfg(
-    #             disable_gravity=True,
-    #             max_depenetration_velocity=5.0,
-    #             linear_damping=0.0,
-    #             angular_damping=0.0,
-    #             max_linear_velocity=1000.0,
-    #             max_angular_velocity=3666.0,
-    #             enable_gyroscopic_forces=True,
-    #             solver_position_iteration_count=192,
-    #             solver_velocity_iteration_count=1,
-    #             max_contact_impulse=1e32,
-    #         ),
-    #         mass_props=sim_utils.MassPropertiesCfg(mass=0.05),
-    #         collision_props=sim_utils.CollisionPropertiesCfg(contact_offset=0.005, rest_offset=0.0),
-    #     ),
-    #     init_state=ArticulationCfg.InitialStateCfg(
-    #         pos=(0.0, 0.4, 0.1), rot=(1.0, 0.0, 0.0, 0.0), joint_pos={}, joint_vel={}
-    #     ),
-    #     actuators={},
-    # )
-
-
-
-
-    sample = AssetBaseCfg(prim_path="{ENV_REGEX_NS}/sample",                                                                # ENV_REGEX_NS allows the part to be replicated for each environment instane
-                        init_state=AssetBaseCfg.InitialStateCfg(pos=[0.3, 0.3, 0.0], rot=[0.707, 0 ,0.0, 0.707]),           # Pose and rotation in format [x,y,z] and [w,a,b,c] respectively           # 
-                        spawn=sim_utils.UsdFileCfg(usd_path=f"/home/ethanallan175/IsaacLab/source/extensions/omni.isaac.lab_tasks/omni/isaac/lab_tasks/manager_based/custom/screw_removal/sample.usd" ))
+    # sample = AssetBaseCfg(prim_path="{ENV_REGEX_NS}/sample",                                                                # ENV_REGEX_NS allows the part to be replicated for each environment instane
+    #                     init_state=AssetBaseCfg.InitialStateCfg(pos=[0.3, 0.3, 0.0], rot=[0.707, 0 ,0.0, 0.707]),           # Pose and rotation in format [x,y,z] and [w,a,b,c] respectively           # 
+    #                     spawn=sim_utils.UsdFileCfg(usd_path=f"/home/ethanallan175/IsaacLab/source/extensions/omni.isaac.lab_tasks/omni/isaac/lab_tasks/manager_based/custom/screw_removal/sample.usd" ))
 
     
     # Spawns dome light
@@ -323,15 +243,15 @@ class EventCfg:
     # Resets all the joints to some random position
     reset_all = EventTerm(func=mdp.reset_scene_to_default, mode="reset")
 
-    # reset_object_position = EventTerm(
-    #     func=mdp.reset_root_state_uniform,
-    #     mode="reset",
-    #     params={
-    #         "pose_range": {"x": (-0.1, 0.1), "y": (-0.25, 0.25), "z": (0.0, 0.0)},
-    #         "velocity_range": {},
-    #         "asset_cfg": SceneEntityCfg("peg", body_names="peg"),
-    #     },
-    # )
+    reset_object_position = EventTerm(
+        func=mdp.reset_root_state_uniform,
+        mode="reset",
+        params={
+            "pose_range": {"x": (-0.1, 0.1), "y": (-0.25, 0.25), "z": (0.0, 0.0)},
+            "velocity_range": {},
+            "asset_cfg": SceneEntityCfg("peg", body_names="peg"),
+        },
+    )
 
 #-------------------------------------------------------------------------------------------
 @configclass
@@ -348,7 +268,7 @@ class TerminationsCfg:
 class FrankaEnvCfg(ManagerBasedRLEnvCfg):
 
     # Scene configuration
-    scene = FrankaTestSceneCfg(num_envs=22, env_spacing=2.0)
+    scene = FrankaTestSceneCfg(num_envs=1536, env_spacing=2.0)
 
 
 
@@ -390,15 +310,16 @@ class FrankaEnvCfg(ManagerBasedRLEnvCfg):
     def __post__init__(self):
         self.viewer.eye = [4.5,0.0,6.0]
         self.viewer.lookat = [0.8, 0.0, 0.5]
+        self.decimation =1
         self.sim.render_interval = self.decimation
-
+        self.episode_length_s = 20
         self.sim.dt = 1.0 /60.0
 
-        self.sim.physx.bounce_threshold_velocity = 0.2
-        self.sim.physx.bounce_threshold_velocity = 0.01
-        self.sim.physx.gpu_found_lost_aggregate_pairs_capacity = 1024 * 1024 * 4
-        self.sim.physx.gpu_total_aggregate_pairs_capacity = 16 * 1024
-        self.sim.physx.friction_correlation_distance = 0.00625
+        # self.sim.physx.bounce_threshold_velocity = 0.2
+        # self.sim.physx.bounce_threshold_velocity = 0.01
+        # self.sim.physx.gpu_found_lost_aggregate_pairs_capacity = 1024 * 1024 * 4
+        # self.sim.physx.gpu_total_aggregate_pairs_capacity = 16 * 1024
+        # self.sim.physx.friction_correlation_distance = 0.00625
 
         
 
