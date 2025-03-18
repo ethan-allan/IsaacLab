@@ -42,9 +42,11 @@ def reset_peg(
     # get default root state of sample
     sample_pos_w = sample.data.root_pos_w[:, :3]
     sample_quat_w = sample.data.root_quat_w[:, :4]
-
-    pos_offset = torch.tensor([0.020, 0.03, 0.65], device=env.device)
-    quat_offset = torch.tensor([0.707, 0.707, 0.0, 0.0], device=env.device)
+    print(sample_quat_w)
+    pos_offset = torch.tensor([0.000, 0.00, 0.05], device=env.device)
+    quat_offset = torch.tensor([-0.293, 0.7070,0, 0], device=env.device)
+    length = sample_quat_w.shape[0]
+    zero_rot = torch.zeros([length,4], device=env.device)
     #compute new position
     positions = torch.add(sample_pos_w , pos_offset) 
     orientations = torch.add(sample_quat_w, quat_offset)

@@ -106,7 +106,7 @@ def main():
         directory_path=log_dir,
         filename=args_cli.filename,
         num_demos=args_cli.num_demos,
-        flush_freq=env.num_envs,
+        flush_freq=1,
         env_config={"teleop_device": args_cli.teleop_device},
     )
 

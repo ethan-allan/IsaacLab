@@ -95,7 +95,7 @@ class FrankaTestSceneCfg(InteractiveSceneCfg):
             prim_path="{ENV_REGEX_NS}/peg",
             spawn=sim_utils.UsdFileCfg(
                 usd_path=f"/home/ethanallan175/IsaacLab/source/extensions/custom_assets/peg/peg.usd",
-               
+                # usd_path=f"/home/ethanallan175/IsaacLab/source/standalone/custom/assets/peg_usd_v2/peg2.usd",
                 rigid_props=sim_utils.RigidBodyPropertiesCfg(
                     rigid_body_enabled=True,
                     max_linear_velocity=1000.0,
@@ -109,15 +109,15 @@ class FrankaTestSceneCfg(InteractiveSceneCfg):
     sample = RigidObjectCfg(
             prim_path="{ENV_REGEX_NS}/sample",
             spawn=sim_utils.UsdFileCfg(
-                usd_path=f"/home/ethanallan175/IsaacLab/source/extensions/custom_assets/sample/sample.usd",
-               
+                usd_path=f"/home/ethanallan175/IsaacLab/source/extensions/custom_assets/sample_v3/sample.usd",
                 rigid_props=sim_utils.RigidBodyPropertiesCfg(
                     rigid_body_enabled=True,
                     max_linear_velocity=1000.0,
                     max_angular_velocity=1000.0,
                     max_depenetration_velocity=5.0,
                     enable_gyroscopic_forces=True,
-                    disable_gravity=False
+                    disable_gravity=False,
+                    kinematic_enabled=True
                 )
             ),  
         )
@@ -272,7 +272,7 @@ class EventCfg:
         func=mdp.reset_root_state_uniform,
         mode="reset",
         params={
-            "pose_range": {"x": (0.3, 0.6), "y": (-0.4, 0.4), "z": (0.0, 0.0), "roll": (1.57, 1.57), "pitch": (0.0, 0.0), "yaw": (0.0, 0.0)},
+            "pose_range": {"x": (0.3, 0.6), "y": (-0.4, 0.4), "z": (0.0, 0.0), "roll": (0,0), "pitch": (0.0, 0.0), "yaw": (0.0, 0.0)},
             "velocity_range": {},
        
             "asset_cfg": SceneEntityCfg("sample", body_names="sample"),
@@ -340,7 +340,7 @@ class FrankaEnvCfg(ManagerBasedRLEnvCfg):
     )
    
     def __post__init__(self):
-        self.viewer.eye = [4.5,0.0,6.0]
+        self.viewer.eye = [1.5,0.0,2.0]
         self.viewer.lookat = [0.8, 0.0, 0.5]
         self.decimation =2 
         self.episode_length_s = 5
